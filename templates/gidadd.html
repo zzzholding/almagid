@@ -88,33 +88,64 @@
     <a href="almagid.html" class="back">← На главную</a>
     <h1>Добавить место</h1>
 
-    <form>
+    <form id="placeForm">
       <label>Название места</label>
-      <input type="text" placeholder="Например: Кок-Тобе" required>
+      <input id="name" name="name" type="text" placeholder="Например: Кок-Тобе" required>
 
       <label>Область / Город</label>
-      <input type="text" placeholder="Алматы, Казахстан" required>
+      <input id="location" name="location" type="text" placeholder="Алматы, Казахстан" required>
 
-      <label>Картинка (URL или файл)</label>
-      <input type="file" accept="image/*">
+      <label>Картинка (файл)</label>
+      <input id="image" name="image" type="file" accept="image/*">
 
       <label>Цена (если есть)</label>
-      <input type="text" placeholder="Например: 2000 тг / вход">
+      <input id="price_text" name="price_text" type="text" placeholder="Например: 2000 тг / вход">
 
       <label>Рейтинг</label>
-      <select>
-        <option>5 ★</option>
-        <option>4 ★</option>
-        <option>3 ★</option>
-        <option>2 ★</option>
-        <option>1 ★</option>
+      <select id="rating" name="rating" required>
+        <option value="5">5 ★</option>
+        <option value="4">4 ★</option>
+        <option value="3">3 ★</option>
+        <option value="2">2 ★</option>
+        <option value="1">1 ★</option>
       </select>
 
       <label>Описание</label>
-      <textarea placeholder="Краткое описание достопримечательности..."></textarea>
+      <textarea id="description" name="description" placeholder="Краткое описание достопримечательности..."></textarea>
 
       <button class="btn" type="submit">Добавить место</button>
     </form>
   </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";  // твой FastAPI
+
+    const form = document.getElementById("placeForm");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      try {
+        const resp = await fetch(API + "/places", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok) {
+          alert("Ошибка: " + (data.detail || resp.statusText));
+          return;
+        }
+
+        alert("Место добавлено! ID: " + data.id);
+        form.reset();
+      } catch (err) {
+        alert("Ошибка сети: " + err.message);
+      }
+    });
+  </script>
 </body>
 </html>
