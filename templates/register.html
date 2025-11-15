@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>АлмаГид — Регистрация</title>
+  <style>
+    :root{
+      --accent:#2b8aef;
+      --muted:#6b7280;
+      --bg:#f7f9fc;
+      --card:#ffffff;
+      font-family: Inter, Roboto, Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+    }
+
+    .card{
+      background:var(--card);
+      width:100%;
+      max-width:400px;
+      padding:28px;
+      border-radius:16px;
+      box-shadow:0 8px 24px rgba(16,24,40,0.1);
+    }
+
+    h1{text-align:center;margin:0 0 24px;}
+    label{display:block;margin:10px 0 4px;color:var(--muted);}
+    input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,0.1);
+      outline:none;
+      font-size:15px;
+    }
+
+    .btn{
+      margin-top:16px;
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      background:var(--accent);
+      color:#fff;
+      font-size:16px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+    .btn:hover{background:#1d73d9;}
+
+    .switch{
+      text-align:center;
+      margin-top:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .switch a{
+      color:var(--accent);
+      text-decoration:none;
+      font-weight:600;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Регистрация</h1>
+
+    <form id="registerForm">
+      <label>ФИО</label>
+      <input id="regFullName" type="text" placeholder="Введите ваше ФИО" required>
+
+      <label>Номер телефона</label>
+      <input id="regPhone" type="tel" placeholder="+7 700 000 0000" required>
+
+      <label>Почта</label>
+      <input id="regEmail" type="email" placeholder="example@mail.com" required>
+
+      <label>Пароль</label>
+      <input id="regPassword" type="password" placeholder="Придумайте пароль" required>
+
+      <button class="btn" type="submit">Зарегистрироваться</button>
+
+      <div class="switch">
+        Уже есть аккаунт?
+        <a href="login.html">Войти</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const API = "http://localhost:8000";
+
+    const registerForm = document.getElementById("registerForm");
+    const regFullName  = document.getElementById("regFullName");
+    const regPhone     = document.getElementById("regPhone");
+    const regEmail     = document.getElementById("regEmail");
+    const regPassword  = document.getElementById("regPassword");
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const response = await fetch(API + "/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            full_name: regFullName.value.trim(),
+            phone:     regPhone.value.trim(),
+            email:     regEmail.value.trim(),
+            password:  regPassword.value
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Ошибка регистрации");
+        }
+
+        alert("Регистрация успешна. Теперь войдите.");
+        window.location.href = "login.html";
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Добавить место — АлмаГид</title>
+  <style>
+    :root {
+      --accent: #2b8aef;
+      --muted: #6b7280;
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      font-family: Inter, Roboto, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      margin: 0;
+      padding: 40px 16px;
+      display: flex;
+      justify-content: center;
+      color: #111;
+    }
+
+    .form-card {
+      background: var(--card);
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(16,24,40,0.1);
+      width: 100%;
+      max-width: 520px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.1);
+      font-size: 15px;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #1d73d9;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-card">
+    <a href="almagid.html" class="back">← На главную</a>
+    <h1>Добавить место</h1>
+
+    <form>
+      <label>Название места</label>
+      <input type="text" placeholder="Например: Кок-Тобе" required>
+
+      <label>Область / Город</label>
+      <input type="text" placeholder="Алматы, Казахстан" required>
+
+      <label>Картинка (URL или файл)</label>
+      <input type="file" accept="image/*">
+
+      <label>Цена (если есть)</label>
+      <input type="text" placeholder="Например: 2000 тг / вход">
+
+      <label>Рейтинг</label>
+      <select>
+        <option>5 ★</option>
+        <option>4 ★</option>
+        <option>3 ★</option>
+        <option>2 ★</option>
+        <option>1 ★</option>
+      </select>
+
+      <label>Описание</label>
+      <textarea placeholder="Краткое описание достопримечательности..."></textarea>
+
+      <button class="btn" type="submit">Добавить место</button>
+    </form>
+  </div>
+</body>
+</html>
