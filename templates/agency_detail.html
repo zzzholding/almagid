@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тур-агентство — АлмаГид</title>
+  <style>
+    :root {
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --danger: #ef4444;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: #111827;
+    }
+
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .topbar-left h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .topbar-left span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-outline, .btn-primary {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+    }
+
+    .btn-primary {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline:hover {
+      background: #f9fafb;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 18px rgba(15,23,42,0.12);
+    }
+
+    .main-image-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #e5e7eb;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .info-header {
+      margin-top: 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .info-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .badge-rating {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #92400e;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .location {
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .price-block {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #ecfdf5;
+      font-size: 14px;
+      color: #166534;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #374151;
+      white-space: pre-wrap;
+    }
+
+    .meta-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .meta-item {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    .meta-value {
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .gallery-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+    }
+
+    .gallery-item {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e5e7eb;
+      height: 90px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-item::after {
+      content: "Открыть";
+      position: absolute;
+      inset: auto 8px 6px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.7);
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 2px 6px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .gallery-item:hover::after {
+      opacity: 1;
+    }
+
+    .empty-gallery {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .error {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="pageTitle">Тур-агентство</h1>
+        <span id="pageSubtitle">Загрузка данных...</span>
+      </div>
+      <div>
+        <a href="agencies.html" class="btn-outline">← Назад к списку</a>
+      </div>
+    </div>
+
+    <div id="errorBox" class="error" style="display:none;"></div>
+
+    <div class="content" id="content" style="display:none;">
+      <!-- Левая часть: фото + описание -->
+      <div class="card">
+        <div class="main-image-wrap" id="mainImageWrap">
+          <span id="noImageText" style="font-size:13px; color:#6b7280;">Нет изображения</span>
+        </div>
+
+        <div class="info-header">
+          <div>
+            <div class="info-title" id="agencyName">Название агентства</div>
+            <div class="location" id="agencyLocation">Город / регион</div>
+          </div>
+          <div class="badge-rating" id="ratingBadge">
+            ★ 0.0
+          </div>
+        </div>
+
+        <div id="priceBlock" class="price-block" style="display:none;">
+          <strong>Стоимость:</strong>
+          <span id="agencyPrice"></span>
+        </div>
+
+        <div class="section-title">Описание</div>
+        <div class="description" id="agencyDescription">
+          Описание отсутствует.
+        </div>
+      </div>
+
+      <!-- Правая часть: мета + галерея -->
+      <div class="card">
+        <div class="section-title">Информация</div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">ID агентства</div>
+            <div class="meta-value" id="metaId">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Рейтинг</div>
+            <div class="meta-value" id="metaRating">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Город</div>
+            <div class="meta-value" id="metaLocation">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Цена</div>
+            <div class="meta-value" id="metaPrice">—</div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:18px;">Галерея</div>
+        <div id="gallery" class="gallery-grid"></div>
+        <div id="galleryEmpty" class="empty-gallery" style="display:none;">
+          Пока доступно только основное фото (или ни одного).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+
+    const params = new URLSearchParams(window.location.search);
+    const agencyId = Number(params.get("id"));
+
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
+    const errorBox = document.getElementById("errorBox");
+    const content = document.getElementById("content");
+
+    const mainImageWrap = document.getElementById("mainImageWrap");
+    const noImageText = document.getElementById("noImageText");
+
+    const agencyName = document.getElementById("agencyName");
+    const agencyLocation = document.getElementById("agencyLocation");
+    const ratingBadge = document.getElementById("ratingBadge");
+    const priceBlock = document.getElementById("priceBlock");
+    const agencyPrice = document.getElementById("agencyPrice");
+    const agencyDescription = document.getElementById("agencyDescription");
+
+    const metaId = document.getElementById("metaId");
+    const metaRating = document.getElementById("metaRating");
+    const metaLocation = document.getElementById("metaLocation");
+    const metaPrice = document.getElementById("metaPrice");
+
+    const gallery = document.getElementById("gallery");
+    const galleryEmpty = document.getElementById("galleryEmpty");
+
+    if (!agencyId) {
+      errorBox.style.display = "block";
+      errorBox.textContent = "Не указан ID агентства в адресной строке.";
+      pageSubtitle.textContent = "Ошибка";
+    } else {
+      loadAgency();
+    }
+
+    async function loadAgency() {
+      try {
+        pageSubtitle.textContent = "Загрузка данных об агентстве...";
+
+        // Можно было сделать GET /places/{id}, но используем /places и ищем по id,
+        // чтобы не менять backend.
+        const resp = await fetch(API + "/places");
+        if (!resp.ok) {
+          throw new Error("Сервер вернул статус " + resp.status);
+        }
+        const data = await resp.json();
+        if (!Array.isArray(data)) {
+          throw new Error("Неожиданный формат ответа");
+        }
+
+        const agency = data.find(a => a.id === agencyId);
+        if (!agency) {
+          throw new Error("Агентство с таким ID не найдено");
+        }
+
+        renderAgency(agency);
+      } catch (err) {
+        errorBox.style.display = "block";
+        errorBox.textContent = "Ошибка загрузки агентства: " + err.message;
+        pageSubtitle.textContent = "Ошибка";
+      }
+    }
+
+    function renderAgency(a) {
+      content.style.display = "grid";
+      errorBox.style.display = "none";
+
+      pageTitle.textContent = a.name || "Тур-агентство";
+      pageSubtitle.textContent = a.location || "Город не указан";
+
+      agencyName.textContent = a.name || "Без названия";
+      agencyLocation.textContent = a.location || "Город не указан";
+
+      const rating = a.rating || 0;
+      const stars = "★".repeat(rating || 1);
+      ratingBadge.textContent = `${stars} (${rating})`;
+
+      if (a.price_text) {
+        priceBlock.style.display = "inline-flex";
+        agencyPrice.textContent = a.price_text;
+      } else {
+        priceBlock.style.display = "none";
+      }
+
+      agencyDescription.textContent = a.description || "Описание отсутствует.";
+
+      metaId.textContent = "#" + a.id;
+      metaRating.textContent = rating ? `${rating} / 5` : "—";
+      metaLocation.textContent = a.location || "—";
+      metaPrice.textContent = a.price_text || "—";
+
+      // Основное фото
+      mainImageWrap.innerHTML = "";
+      if (a.image_url) {
+        const img = document.createElement("img");
+        img.src = API + a.image_url;
+        img.alt = a.name || "Фото агентства";
+        mainImageWrap.appendChild(img);
+      } else {
+        const span = document.createElement("span");
+        span.style.fontSize = "13px";
+        span.style.color = "#6b7280";
+        span.textContent = "Нет изображения";
+        mainImageWrap.appendChild(span);
+      }
+
+      // Галерея: сейчас у нас только одно фото (image_url),
+      // но верстка готова под несколько.
+      gallery.innerHTML = "";
+      if (a.image_url) {
+        const item = document.createElement("div");
+        item.className = "gallery-item";
+
+        const img = document.createElement("img");
+        img.src = API + a.image_url;
+        img.alt = a.name || "Фото агентства";
+
+        item.appendChild(img);
+        item.addEventListener("click", () => {
+          // простое поведение: скроллим к большому фото
+          mainImageWrap.scrollIntoView({ behavior: "smooth" });
+        });
+
+        gallery.appendChild(item);
+        galleryEmpty.style.display = "none";
+      } else {
+        galleryEmpty.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>

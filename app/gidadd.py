@@ -1,12 +1,11 @@
-# app/places.py
+# app/gidadd.py
 
 import os
 import time
 import pathlib
-from datetime import datetime, timezone
 from collections.abc import Generator
 
-from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -24,14 +23,22 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
 # ---------- Конфиг ----------
-SQLALCHEMY_DATABASE_URL = (
-    "postgresql+psycopg2://my_user:root@localhost:5438/my_db"
+
+# Корень проекта: .../Almagid
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+
+# Подключение к БД (оставляем как у тебя)
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg2://my_user:root@localhost:5438/my_db",
 )
 
-UPLOAD_DIR = "static/uploads"
+# Папка для загрузки картинок: <проект>/static/uploads
+UPLOAD_DIR = BASE_DIR / "static" / "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # ---------- БД ----------
+
 engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -62,6 +69,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 # ---------- Pydantic-схемы ----------
+
 class PlaceOut(BaseModel):
     id: int
     name: str
@@ -72,18 +80,22 @@ class PlaceOut(BaseModel):
     description: str | None
 
     class Config:
-        from_attributes = True
+        from_attributes = True  # Pydantic v2
 
 
 # ---------- Приложение ----------
+
 app = FastAPI(title="AlmaGid Places API")
 
-# статика: /static/...
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Статика: /static/...
+static_dir = BASE_DIR / "static"
+os.makedirs(static_dir, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # чтобы HTML с 127.0.0.1:5500 мог ходить к API
+    allow_origins=["*"],   # чтобы HTML мог ходить к API
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -96,6 +108,7 @@ def root():
 
 
 # ---------- Добавление места ----------
+
 @app.post("/places", response_model=PlaceOut, status_code=201)
 async def create_place(
     name: str = Form(...),
@@ -108,15 +121,21 @@ async def create_place(
 ):
     image_url: str | None = None
 
+    # Если картинка передана — сохраняем её в static/uploads
     if image and image.filename:
         ext = pathlib.Path(image.filename).suffix or ".jpg"
         filename = f"{int(time.time())}_{os.urandom(4).hex()}{ext}"
-        save_path = os.path.join(UPLOAD_DIR, filename)
+        save_path = UPLOAD_DIR / filename
 
+        contents = await image.read()
         with open(save_path, "wb") as f:
-            f.write(await image.read())
+            f.write(contents)
 
+        # URL, по которому фронт будет получать файл
         image_url = f"/static/uploads/{filename}"
+
+        # Можно включить отладочный print:
+        print("Saved image to:", save_path)
 
     place = Place(
         name=name.strip(),
@@ -135,9 +154,11 @@ async def create_place(
 
 
 # ---------- Список мест ----------
+
 @app.get("/places", response_model=list[PlaceOut])
 def list_places(db: Session = Depends(get_db)):
     places = db.query(Place).order_by(Place.created_at.desc()).all()
     return places
+
 
 

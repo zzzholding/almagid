@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тур-агентства — АлмаГид</title>
+  <style>
+    :root {
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --danger: #ef4444;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: #111827;
+    }
+
+    .layout {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .topbar-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .topbar-title span {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr) minmax(0, 1.2fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .field, .select {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      padding: 8px 12px;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+      background: #fff;
+    }
+
+    .field:focus, .select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip span {
+      font-weight: 500;
+      color: #111827;
+    }
+
+    .chip .value {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .card-image {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .badge-rating {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      color: #fbbf24;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .agency-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .agency-name span {
+      flex: 1;
+    }
+
+    .location {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price {
+      font-size: 14px;
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #374151;
+      margin-top: 4px;
+      max-height: 3.6em;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .link-more {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .link-more:hover {
+      text-decoration: underline;
+    }
+
+    .empty {
+      margin-top: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .error {
+      margin-top: 20px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 16px;
+      }
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Тур-агентства</h1>
+        <span>Список агентств, добавленных в АлмаГид</span>
+      </div>
+      <div class="topbar-actions">
+        <a href="gidadd.html" class="btn-primary">+ Добавить агентство</a>
+        <a href="almagid.html" class="btn-outline">На главную</a>
+      </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Поиск по названию</span>
+        <input id="searchInput" class="field" type="text" placeholder="Например: Asia Travel, Nomad Tour..." />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Город / регион</span>
+        <select id="citySelect" class="select">
+          <option value="">Все города</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Минимальный рейтинг</span>
+        <select id="ratingSelect" class="select">
+          <option value="0">Любой</option>
+          <option value="5">Только 5★</option>
+          <option value="4">4★ и выше</option>
+          <option value="3">3★ и выше</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Активные фильтры (чипы) -->
+    <div class="chips" id="chipsContainer">
+      <!-- Будут подставляться динамически -->
+    </div>
+
+    <!-- Сетка карточек -->
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">Пока нет ни одного тур-агентства. Добавьте первое через форму.</div>
+    <div id="error" class="error" style="display:none;"></div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+
+    const grid = document.getElementById("grid");
+    const empty = document.getElementById("empty");
+    const errorBox = document.getElementById("error");
+
+    const searchInput = document.getElementById("searchInput");
+    const citySelect = document.getElementById("citySelect");
+    const ratingSelect = document.getElementById("ratingSelect");
+    const chipsContainer = document.getElementById("chipsContainer");
+
+    let allAgencies = [];
+
+    function renderChips() {
+      chipsContainer.innerHTML = "";
+
+      const searchText = searchInput.value.trim();
+      const city = citySelect.value;
+      const minRating = Number(ratingSelect.value || 0);
+
+      const filters = [];
+
+      if (searchText) {
+        filters.push({ label: "Поиск", value: searchText });
+      }
+      if (city) {
+        filters.push({ label: "Город", value: city });
+      }
+      if (minRating > 0) {
+        filters.push({ label: "Рейтинг", value: minRating + "★ и выше" });
+      }
+
+      if (filters.length === 0) {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = "<span>Фильтры</span><span class='value'>не применены</span>";
+        chipsContainer.appendChild(chip);
+        return;
+      }
+
+      for (const f of filters) {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `<span>${f.label}:</span><span class="value">${f.value}</span>`;
+        chipsContainer.appendChild(chip);
+      }
+    }
+
+    function applyFilters() {
+      const searchText = searchInput.value.trim().toLowerCase();
+      const city = citySelect.value;
+      const minRating = Number(ratingSelect.value || 0);
+
+      let filtered = [...allAgencies];
+
+      if (searchText) {
+        filtered = filtered.filter(a =>
+          a.name.toLowerCase().includes(searchText)
+        );
+      }
+
+      if (city) {
+        filtered = filtered.filter(a => (a.location || "").toLowerCase() === city.toLowerCase());
+      }
+
+      if (minRating > 0) {
+        filtered = filtered.filter(a => (a.rating || 0) >= minRating);
+      }
+
+      renderChips();
+      renderGrid(filtered);
+    }
+
+    function renderGrid(list) {
+      grid.innerHTML = "";
+      errorBox.style.display = "none";
+
+      if (!list || list.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      for (const agency of list) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        // --- картинка ---
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "card-image";
+
+        const img = document.createElement("img");
+        if (agency.image_url) {
+          img.src = API + agency.image_url;
+          img.alt = agency.name;
+        } else {
+          img.alt = "Нет изображения";
+        }
+        imgWrap.appendChild(img);
+
+        const ratingBadge = document.createElement("div");
+        ratingBadge.className = "badge-rating";
+        const stars = "★".repeat(agency.rating || 0) || "★";
+        ratingBadge.textContent = `${stars} (${agency.rating || 0})`;
+        imgWrap.appendChild(ratingBadge);
+
+        card.appendChild(imgWrap);
+
+        // --- тело карточки ---
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "agency-name";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = agency.name;
+        nameRow.appendChild(nameSpan);
+        body.appendChild(nameRow);
+
+        const loc = document.createElement("div");
+        loc.className = "location";
+        loc.textContent = agency.location || "Город не указан";
+        body.appendChild(loc);
+
+        if (agency.price_text) {
+          const price = document.createElement("div");
+          price.className = "price";
+          price.textContent = agency.price_text;
+          body.appendChild(price);
+        }
+
+        if (agency.description) {
+          const desc = document.createElement("div");
+          desc.className = "description";
+          desc.textContent = agency.description;
+          body.appendChild(desc);
+        }
+
+        // --- футер ---
+        const footer = document.createElement("div");
+        footer.className = "card-footer";
+
+        const idLabel = document.createElement("div");
+        idLabel.textContent = "ID #" + agency.id;
+
+        const more = document.createElement("a");
+        more.href = `agency_detail.html?id=${agency.id}`;
+        more.className = "link-more";
+        more.textContent = "Подробнее";
+        more.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = `agency_detail.html?id=${agency.id}`;
+        });
+
+
+        footer.appendChild(idLabel);
+        footer.appendChild(more);
+
+        body.appendChild(footer);
+        card.appendChild(body);
+
+        grid.appendChild(card);
+      }
+    }
+
+    function fillCityFilter(agencies) {
+      const cities = new Set();
+      agencies.forEach(a => {
+        if (a.location) {
+          cities.add(a.location.trim());
+        }
+      });
+
+      citySelect.innerHTML = '<option value="">Все города</option>';
+
+      Array.from(cities)
+        .sort((a, b) => a.localeCompare(b, "ru"))
+        .forEach(city => {
+          const opt = document.createElement("option");
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+    }
+
+    async function loadAgencies() {
+      try {
+        const resp = await fetch(API + "/places");
+        if (!resp.ok) {
+          throw new Error("Сервер вернул статус " + resp.status);
+        }
+        const data = await resp.json();
+        if (!Array.isArray(data)) {
+          throw new Error("Неожиданный формат ответа");
+        }
+
+        allAgencies = data;
+        fillCityFilter(allAgencies);
+        renderChips();
+        renderGrid(allAgencies);
+      } catch (err) {
+        console.error(err);
+        errorBox.style.display = "block";
+        errorBox.textContent = "Ошибка загрузки списка агентств: " + err.message;
+        empty.style.display = "none";
+      }
+    }
+
+    // События фильтров
+    searchInput.addEventListener("input", () => {
+      applyFilters();
+    });
+    citySelect.addEventListener("change", () => {
+      applyFilters();
+    });
+    ratingSelect.addEventListener("change", () => {
+      applyFilters();
+    });
+
+    loadAgencies();
+  </script>
+</body>
+</html>

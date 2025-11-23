@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: alma_db
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: my_db
+    ports:
+      - "440:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: alma_api
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # на всякий случай, если .env нет
+      DATABASE_URL: postgresql+psycopg2://my_user:root@db:5432/my_db
+      JWT_SECRET: change_me_secret_key
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+volumes:
+  pg_data:
