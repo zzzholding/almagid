@@ -117,7 +117,7 @@
           throw new Error(data.detail || "Ошибка входа");
         }
 
-        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("almagid_token", data.access_token);
         alert("Вход выполнен");
 
         // после успешного входа переходим на главную АлмаГид

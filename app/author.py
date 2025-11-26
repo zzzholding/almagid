@@ -10,6 +10,22 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 
 from app.models import User  # покажу ниже
+from fastapi import Header
+
+def get_current_user(Authorization: str = Header(...), db: Session = Depends(get_db)):
+    try:
+        token = Authorization.split(" ")[1]
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = int(payload["sub"])
+    except:
+        raise HTTPException(401, "Invalid token")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(401, "User not found")
+
+    return user
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

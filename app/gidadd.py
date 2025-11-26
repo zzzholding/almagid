@@ -3,13 +3,13 @@ import time
 import pathlib
 from typing import Generator
 
-from fastapi import APIRouter, UploadFile, File, Form, Depends
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from pydantic import BaseModel
 from app.db import get_db
 from app.models import Place
-
+from app.author import get_current_user
 
 router = APIRouter(prefix="/places", tags=["places"])
 
@@ -40,27 +40,29 @@ async def create_place(
     description: str | None = Form(None),
     image: UploadFile | None = File(None),
     db: Session = Depends(get_db),
+    user=Depends(get_current_user)
 ):
+
     image_url = None
 
     if image and image.filename:
-        ext = pathlib.Path(image.filename).suffix or ".jpg"
+        ext = pathlib.Path(image.filename).suffix
         filename = f"{int(time.time())}_{os.urandom(4).hex()}{ext}"
         save_path = UPLOAD_DIR / filename
-        contents = await image.read()
 
         with open(save_path, "wb") as f:
-            f.write(contents)
+            f.write(await image.read())
 
         image_url = f"/static/uploads/{filename}"
 
     place = Place(
         name=name.strip(),
         location=location.strip(),
-        image_url=image_url,
-        price_text=price_text.strip() if price_text else None,
+        price_text=price_text,
         rating=rating,
-        description=description.strip() if description else None,
+        description=description,
+        image_url=image_url,
+        user_id=user.id
     )
 
     db.add(place)
@@ -75,6 +77,29 @@ def list_places(db: Session = Depends(get_db)):
     return db.query(Place).order_by(Place.created_at.desc()).all()
 
 
+@router.get("/my", response_model=list[PlaceOut])
+def get_my_places(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    return db.query(Place).filter(Place.user_id == user.id).all()
 
 
+@router.delete("/{place_id}")
+def delete_place(
+    place_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    place = db.query(Place).filter(Place.id == place_id).first()
 
+    if not place:
+        raise HTTPException(404, "Place not found")
+
+    if place.user_id != user.id:
+        raise HTTPException(403, "Forbidden")
+
+    db.delete(place)
+    db.commit()
+
+    return {"status": "deleted"}

@@ -95,8 +95,8 @@
       <label>Область / Город</label>
       <input id="location" name="location" type="text" placeholder="Алматы, Казахстан" required>
 
-      <label>Картинка (файл)</label>
-      <input id="image" name="image" type="file" accept="image/*">
+      <label>Картинки (можно несколько)</label>
+      <input id="image" name="image" type="file">
 
 
       <label>Цена (если есть)</label>
@@ -118,36 +118,54 @@
     </form>
   </div>
 
-  <script>
-    const API = "http://127.0.0.1:8000";  // FastAPI
+<script>
+const API = "http://127.0.0.1:8000";
+const form = document.getElementById("placeForm");
 
-    const form = document.getElementById("placeForm");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  const formData = new FormData();
+  formData.append("name", document.getElementById("name").value);
+  formData.append("location", document.getElementById("location").value);
+  formData.append("price_text", document.getElementById("price_text").value);
+  formData.append("rating", document.getElementById("rating").value);
+  formData.append("description", document.getElementById("description").value);
 
-      const formData = new FormData(form);
+  const imgFile = document.getElementById("image").files[0];
+  if (imgFile) {
+    formData.append("image", imgFile);
+  }
 
-      try {
-        const resp = await fetch(API + "/places", {
-          method: "POST",
-          body: formData
-        });
+  const token = localStorage.getItem("token");
 
-        const data = await resp.json().catch(() => ({}));
-
-        if (!resp.ok) {
-          alert("Ошибка: " + (data.detail || resp.statusText));
-          return;
-        }
-
-        alert("Место добавлено! ID: " + data.id);
-        form.reset();
-      } catch (err) {
-        alert("Ошибка сети: " + err.message);
-      }
+  try {
+    const resp = await fetch(API + "/places", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token
+      },
+      body: formData
     });
-  </script>
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      console.error("FULL ERROR >>>", data);
+      alert(data.detail || "Ошибка");
+      return;
+    }
+
+    alert("Место добавлено! ID: " + data.id);
+    form.reset();
+
+  } catch (err) {
+    alert("Ошибка сети: " + err.message);
+  }
+});
+</script>
+
+
 </body>
 </html>
 
