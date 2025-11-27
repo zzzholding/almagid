@@ -26,4 +26,5 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router)
 app.include_router(places_router)
+#python -m uvicorn app.main:app --reload
 

@@ -137,7 +137,7 @@ form.addEventListener("submit", async (e) => {
     formData.append("image", imgFile);
   }
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("almagid_token");
 
   try {
     const resp = await fetch(API + "/places", {
