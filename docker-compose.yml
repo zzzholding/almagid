@@ -1,4 +1,7 @@
+version: "3.9"
+
 services:
+
   db:
     image: postgres:15
     container_name: alma_db
@@ -19,8 +22,6 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-    volumes:
-      - redis_data:/data
 
   api:
     build: .
@@ -31,7 +32,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg2://my_user:root@db:5432/my_db
       JWT_SECRET: change_me_secret_key
-      REDIS_HOST: redis
+      REDIS_HOST: alma_redis       # <── ВОТ ТУТ ДОЛЖНО БЫТЬ
     depends_on:
       - db
       - redis
@@ -42,5 +43,6 @@ services:
 
 volumes:
   pg_data:
-  redis_data:
+
+
 

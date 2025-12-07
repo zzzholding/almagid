@@ -1,15 +1,16 @@
 import os
 import time
 import pathlib
-from typing import Generator
+import json
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from pydantic import BaseModel
+
 from app.db import get_db
 from app.models import Place
 from app.author import get_current_user
+from app.redis_client import redis_client   # <─ добавили Redis
 
 router = APIRouter(prefix="/places", tags=["places"])
 
@@ -31,6 +32,9 @@ class PlaceOut(BaseModel):
         from_attributes = True
 
 
+CACHE_KEY_ALL = "places:list"   # ключ кэша для /places
+
+
 @router.post("/", response_model=PlaceOut, status_code=201)
 async def create_place(
     name: str = Form(...),
@@ -40,9 +44,8 @@ async def create_place(
     description: str | None = Form(None),
     image: UploadFile | None = File(None),
     db: Session = Depends(get_db),
-    user=Depends(get_current_user)
+    user = Depends(get_current_user),
 ):
-
     image_url = None
 
     if image and image.filename:
@@ -62,25 +65,44 @@ async def create_place(
         rating=rating,
         description=description,
         image_url=image_url,
-        user_id=user.id
+        user_id=user.id,
     )
 
     db.add(place)
     db.commit()
     db.refresh(place)
 
+    # инвалидируем кэш списка
+    redis_client.delete(CACHE_KEY_ALL)
+
     return place
 
 
 @router.get("/", response_model=list[PlaceOut])
 def list_places(db: Session = Depends(get_db)):
-    return db.query(Place).order_by(Place.created_at.desc()).all()
+    """
+    GET /places — теперь с кэшем Redis:
+    1) сначала пробуем прочитать из Redis
+    2) если нет — читаем из БД, кладём в кэш на 60 секунд
+    """
+    cached = redis_client.get(CACHE_KEY_ALL)
+    if cached:
+        # в кэше уже готовый list[dict]
+        return json.loads(cached)
+
+    places = db.query(Place).order_by(Place.created_at.desc()).all()
+    data = [PlaceOut.model_validate(p).model_dump() for p in places]
+
+    # кладём в Redis на 60 секунд
+    redis_client.setex(CACHE_KEY_ALL, 60, json.dumps(data))
+
+    return data
 
 
 @router.get("/my", response_model=list[PlaceOut])
 def get_my_places(
     db: Session = Depends(get_db),
-    user=Depends(get_current_user)
+    user = Depends(get_current_user),
 ):
     return db.query(Place).filter(Place.user_id == user.id).all()
 
@@ -89,7 +111,7 @@ def get_my_places(
 def delete_place(
     place_id: int,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user)
+    user = Depends(get_current_user),
 ):
     place = db.query(Place).filter(Place.id == place_id).first()
 
@@ -102,4 +124,8 @@ def delete_place(
     db.delete(place)
     db.commit()
 
+    # инвалидируем кэш списка
+    redis_client.delete(CACHE_KEY_ALL)
+
     return {"status": "deleted"}
+
