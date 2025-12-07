@@ -10,3 +10,5 @@ passlib[bcrypt]
 python-jose[cryptography]
 pydantic[email]
 python-multipart 
+redis==7.1.0
+

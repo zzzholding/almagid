@@ -71,6 +71,77 @@
       .photo{height:200px}
       .headline{font-size:24px}
     }
+    .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  width: 140px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: white;
+  min-width: 160px;
+  max-height: 200px; /* <= ограничиваем высоту */
+  overflow-y: auto;  /* <= прокрутка */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  z-index: 20;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 14px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-content a:hover {
+  background: #f5f5f5;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+/* Контейнер меню "Мои" */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Список ссылок внутри */
+.dropdown-content {
+  display: none;                  /* по умолчанию скрыто */
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #ffffff;
+  min-width: 180px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  z-index: 1000;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #111827;
+  text-decoration: none;
+}
+
+.dropdown-content a:hover {
+  background: #f3f4f6;
+}
+
+
     .photo {
   height: 240px;
   border-radius: 10px;
@@ -101,13 +172,23 @@
     </div>
 
     <nav class="nav">
-      <button class="btn">Хостелы</button>
-      <button class="btn primary" onclick="window.location.href='#'" >Такси</button>
-      <button class="btn primary" onclick="window.location.href='#'" >Хостелы</button>
-      <button class="btn primary" onclick="window.location.href='my_places.html'" >Мои агентство</button>
-      <button class="btn primary" onclick="window.location.href='agencies.html'" >Тур агентство</button>
-      <button class="btn primary" onclick="window.location.href='gidadd.html'" >Добавить место</button>
-    </nav>
+  <div class="dropdown" id="myDropdown">
+    <button class="btn primary dropdown-btn" onclick="toggleMenu()">Мои ▼</button>
+
+    <div class="dropdown-content">
+      <a href="my_places.html">Мои агентства</a>
+      <a href="my_hostels.html">Мои хостелы</a>
+      <a href="gidadd.html">Добавить место</a>
+      <a href="hostel_add.html">Добавить хостел</a>
+    </div>
+  </div> <!-- ← Вот ЭТОГО НЕ хватало -->
+
+  <button class="btn primary" onclick="window.location.href='#'" >Такси</button>
+  <button class="btn primary" onclick="window.location.href='my_hostels.html'" >Хостелы</button>
+  <button class="btn primary" onclick="window.location.href='agencies.html'" >Тур агентство</button>
+  <button class="btn primary" onclick="window.location.href='gidadd.html'" >Добавить место</button>
+</nav>
+
   </header>
 
   <main>
@@ -181,10 +262,6 @@
   <footer>
     © АлмаГид — Алматы · Все права защищены
   </footer>
-
-  <button class="auth" title="Авторизация" onclick="window.location.href='register.html'">
-  Войти / Регистрация
-</button>
 </body>
 </html>
 

@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Добавить место — АлмаГид</title>
+
   <style>
     :root {
       --accent: #2b8aef;
@@ -31,10 +32,7 @@
       max-width: 520px;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-    }
+    h1 { text-align: center; margin-bottom: 24px; }
 
     label {
       display: block;
@@ -70,9 +68,7 @@
       transition: 0.3s;
     }
 
-    .btn:hover {
-      background: #1d73d9;
-    }
+    .btn:hover { background: #1d73d9; }
 
     .back {
       display: inline-block;
@@ -83,27 +79,37 @@
     }
   </style>
 </head>
+
 <body>
   <div class="form-card">
+
     <a href="almagid.html" class="back">← На главную</a>
+
     <h1>Добавить место</h1>
 
+    <!-- 🟦 ВЫБОР ТИПА -->
+    <label>Что добавить?</label>
+    <select id="typeSelect" required>
+      <option value="places">Тур агентство</option>
+      <option value="hostels">Хостел</option>
+    </select>
+
     <form id="placeForm">
-      <label>Название места</label>
-      <input id="name" name="name" type="text" placeholder="Например: Кок-Тобе" required>
+
+      <label>Название</label>
+      <input id="name" required>
 
       <label>Область / Город</label>
-      <input id="location" name="location" type="text" placeholder="Алматы, Казахстан" required>
+      <input id="location" required>
 
-      <label>Картинки (можно несколько)</label>
-      <input id="image" name="image" type="file">
-
+      <label>Картинка</label>
+      <input id="image" type="file">
 
       <label>Цена (если есть)</label>
-      <input id="price_text" name="price_text" type="text" placeholder="Например: 2000 тг / вход">
+      <input id="price_text">
 
       <label>Рейтинг</label>
-      <select id="rating" name="rating" required>
+      <select id="rating" required>
         <option value="5">5 ★</option>
         <option value="4">4 ★</option>
         <option value="3">3 ★</option>
@@ -112,9 +118,9 @@
       </select>
 
       <label>Описание</label>
-      <textarea id="description" name="description" placeholder="Краткое описание достопримечательности..."></textarea>
+      <textarea id="description"></textarea>
 
-      <button class="btn" type="submit">Добавить место</button>
+      <button class="btn" type="submit">Добавить</button>
     </form>
   </div>
 
@@ -125,6 +131,10 @@ const form = document.getElementById("placeForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // 🟦 Выбираем endpoint
+  const type = document.getElementById("typeSelect").value;
+  const endpoint = "/" + type;  // => "/places" или "/hostels"
+
   const formData = new FormData();
   formData.append("name", document.getElementById("name").value);
   formData.append("location", document.getElementById("location").value);
@@ -132,31 +142,27 @@ form.addEventListener("submit", async (e) => {
   formData.append("rating", document.getElementById("rating").value);
   formData.append("description", document.getElementById("description").value);
 
-  const imgFile = document.getElementById("image").files[0];
-  if (imgFile) {
-    formData.append("image", imgFile);
-  }
+  const img = document.getElementById("image").files[0];
+  if (img) formData.append("image", img);
 
   const token = localStorage.getItem("almagid_token");
 
   try {
-    const resp = await fetch(API + "/places", {
+    const resp = await fetch(API + endpoint, {
       method: "POST",
-      headers: {
-        Authorization: "Bearer " + token
-      },
+      headers: { Authorization: "Bearer " + token },
       body: formData
     });
 
     const data = await resp.json();
 
     if (!resp.ok) {
-      console.error("FULL ERROR >>>", data);
       alert(data.detail || "Ошибка");
+      console.error("FULL ERROR >>>", data);
       return;
     }
 
-    alert("Место добавлено! ID: " + data.id);
+    alert("Успешно добавлено! ID: " + data.id);
     form.reset();
 
   } catch (err) {
@@ -165,7 +171,9 @@ form.addEventListener("submit", async (e) => {
 });
 </script>
 
-
 </body>
 </html>
+
+
+
 

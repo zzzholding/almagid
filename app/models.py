@@ -28,6 +28,23 @@ class Place(Base):
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
+class Hostel(Base):
+    __tablename__ = "hostels"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    location = Column(String(255), nullable=False)
+    image_url = Column(String(500))
+    price_text = Column(String(255))
+    rating = Column(Integer, nullable=False)
+    description = Column(Text)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+
+
 
     
     
