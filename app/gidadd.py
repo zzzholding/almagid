@@ -129,3 +129,48 @@ def delete_place(
 
     return {"status": "deleted"}
 
+@router.put("/{place_id}", response_model=PlaceOut)
+async def update_place(
+    place_id: int,
+    name: str = Form(...),
+    location: str = Form(...),
+    price_text: str | None = Form(None),
+    rating: int = Form(...),
+    description: str | None = Form(None),
+    image: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    place = db.query(Place).filter(Place.id == place_id).first()
+
+    if not place:
+        raise HTTPException(404, "Place not found")
+
+    if place.user_id != user.id:
+        raise HTTPException(403, "Forbidden")
+
+    # обновить обычные поля
+    place.name = name.strip()
+    place.location = location.strip()
+    place.price_text = price_text
+    place.rating = rating
+    place.description = description
+
+    # если загружено новое изображение
+    if image and image.filename:
+        ext = pathlib.Path(image.filename).suffix
+        filename = f"{int(time.time())}_{os.urandom(4).hex()}{ext}"
+        save_path = UPLOAD_DIR / filename
+
+        with open(save_path, "wb") as f:
+            f.write(await image.read())
+
+        place.image_url = f"/static/uploads/{filename}"
+
+    db.commit()
+    db.refresh(place)
+
+    # чистим кэш
+    redis_client.delete(CACHE_KEY_ALL)
+
+    return place

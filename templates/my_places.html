@@ -87,6 +87,20 @@
             font-size: 14px;
         }
 
+        .btn-edit {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-edit:hover {
+            background: #1e6fe0;
+        }
+
         .empty {
             text-align: center;
             margin-top: 40px;
@@ -97,98 +111,103 @@
 </head>
 <body>
 
-    <span class="back-btn" onclick="window.location.href='almagid.html'">← На главную</span>
+<span class="back-btn" onclick="window.location.href='almagid.html'">← На главную</span>
 
-    <h1>Мои агентства</h1>
+<h1>Мои агентства</h1>
 
-    <div id="list" class="grid"></div>
+<div id="list" class="grid"></div>
 
-    <p id="empty" class="empty" style="display: none;">
-        У вас пока нет добавленных агентств.
-    </p>
+<p id="empty" class="empty" style="display: none;">
+    У вас пока нет добавленных агентств.
+</p>
 
-    <script>
-        const API = "http://127.0.0.1:8000";
+<script>
+    const API = "http://127.0.0.1:8000";
 
-        async function loadMyPlaces() {
-            const token = localStorage.getItem("almagid_token");
+    async function loadMyPlaces() {
+        const token = localStorage.getItem("almagid_token");
 
-            if (!token) {
-                alert("Вы не авторизованы!");
-                window.location.href = "login.html";
-                return;
-            }
-
-            const resp = await fetch(API + "/places/my", {
-                headers: {
-                    "Authorization": "Bearer " + token
-                }
-            });
-
-            if (!resp.ok) {
-                alert("Ошибка загрузки: " + resp.status);
-                return;
-            }
-
-            const places = await resp.json();
-
-            if (places.length === 0) {
-                document.getElementById("empty").style.display = "block";
-                return;
-            }
-
-            renderPlaces(places);
+        if (!token) {
+            alert("Вы не авторизованы!");
+            window.location.href = "login.html";
+            return;
         }
 
-        function renderPlaces(items) {
-            const box = document.getElementById("list");
-            box.innerHTML = "";
+        const resp = await fetch(API + "/places/my", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-            for (const p of items) {
-                box.innerHTML += `
-                    <div class="card">
-                        <img src="${p.main_image_url || '/static/noimg.png'}" alt="photo">
+        if (!resp.ok) {
+            alert("Ошибка загрузки: " + resp.status);
+            return;
+        }
 
-                        <div class="title">${p.name}</div>
-                        <div class="location">${p.location}</div>
-                        <div class="price">${p.price_text || ""}</div>
+        const places = await resp.json();
 
-                        <div class="actions">
-                            <button class="btn-del" onclick="deletePlace(${p.id})">
-                                Удалить
-                            </button>
-                        </div>
+        if (places.length === 0) {
+            document.getElementById("empty").style.display = "block";
+            return;
+        }
+
+        renderPlaces(places);
+    }
+
+    function renderPlaces(items) {
+        const box = document.getElementById("list");
+        box.innerHTML = "";
+
+        for (const p of items) {
+            box.innerHTML += `
+                <div class="card">
+                    <img src="${p.image_url || '/static/noimg.png'}" alt="photo">
+
+                    <div class="title">${p.name}</div>
+                    <div class="location">${p.location}</div>
+                    <div class="price">${p.price_text || ""}</div>
+
+                    <div class="actions">
+                        <button class="btn-edit" onclick="editPlace(${p.id})">
+                            Редактировать
+                        </button>
+
+                        <button class="btn-del" onclick="deletePlace(${p.id})">
+                            Удалить
+                        </button>
                     </div>
-                `;
+                </div>
+            `;
+        }
+    }
+
+    function editPlace(id) {
+        window.location.href = "place_edit.html?id=" + id;
+    }
+
+    async function deletePlace(id) {
+        if (!confirm("Удалить агентство?")) return;
+
+        const token = localStorage.getItem("almagid_token");
+
+        const resp = await fetch(API + "/places/" + id, {
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + token
             }
+        });
+
+        if (!resp.ok) {
+            alert("Ошибка удаления");
+            return;
         }
 
-        async function deletePlace(id) {
-            if (!confirm("Удалить агентство?")) return;
-
-            const token = localStorage.getItem("almagid_token");
-
-            const resp = await fetch(API + "/places/" + id, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": "Bearer " + token
-                }
-            });
-
-            if (!resp.ok) {
-                alert("Ошибка удаления");
-                return;
-            }
-
-            alert("Удалено");
-            loadMyPlaces();
-        }
-
+        alert("Удалено");
         loadMyPlaces();
-    </script>
+    }
+
+    loadMyPlaces();
+</script>
 
 </body>
 </html>
-
-
-

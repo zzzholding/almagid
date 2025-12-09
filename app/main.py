@@ -8,7 +8,7 @@ from app.models import Base
 
 from app.author import router as auth_router
 from app.gidadd import router as places_router
-from app.hostels import router as hostels_router  # <<< ДОБАВЛЕНО
+from app.hostels import router as hostels_router
 
 app = FastAPI(title="Almagid API")
 
@@ -23,15 +23,12 @@ app.add_middleware(
 BASE_DIR = Path(__file__).resolve().parent.parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
-# Создание таблиц
 Base.metadata.create_all(bind=engine)
 
-# Подключение роутов
 app.include_router(auth_router)
 app.include_router(places_router)
-app.include_router(hostels_router)  # <<< ДОБАВЛЕНО
+app.include_router(hostels_router)
 
-
-
-
-
+#docker exec -it alma_redis redis-cli
+#docker compose down
+#docker compose up --build

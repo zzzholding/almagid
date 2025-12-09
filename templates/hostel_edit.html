@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование хостела — АлмаГид</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent: #2563eb;
+            --bg: #f4f6fa;
+            --card: #ffffff;
+            --muted: #6b7280;
+        }
+
+        body {
+            background: var(--bg);
+            margin: 0;
+            padding: 24px;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .form-box {
+            max-width: 550px;
+            background: var(--card);
+            padding: 20px;
+            margin: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #d2d6db;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 90px;
+            resize: vertical;
+        }
+
+        .btn {
+            margin-top: 16px;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: var(--accent);
+        }
+
+        .preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Редактировать хостел</h1>
+
+<div class="form-box">
+
+    <form id="editForm">
+
+        <label>Название:</label>
+        <input type="text" id="name" required>
+
+        <label>Город / локация:</label>
+        <input type="text" id="location" required>
+
+        <label>Цена:</label>
+        <input type="text" id="price_text">
+
+        <label>Рейтинг:</label>
+        <select id="rating">
+            <option value="1">1 ★</option>
+            <option value="2">2 ★</option>
+            <option value="3">3 ★</option>
+            <option value="4">4 ★</option>
+            <option value="5">5 ★</option>
+        </select>
+
+        <label>Описание:</label>
+        <textarea id="description"></textarea>
+
+        <label>Текущее изображение:</label>
+        <img id="preview" class="preview" src="#">
+
+        <label>Новое изображение (если нужно заменить):</label>
+        <input type="file" id="image">
+
+        <button class="btn" type="submit">Сохранить изменения</button>
+    </form>
+
+    <a href="my_hostels.html" class="back">← Назад к списку</a>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+const token = localStorage.getItem("almagid_token");
+if (!token) {
+    alert("Вы не авторизованы!");
+    window.location.href = "login.html";
+}
+
+const id = new URLSearchParams(window.location.search).get("id");
+if (!id) {
+    alert("ID не указан");
+    location.href = "my_hostels.html";
+}
+
+// ---------- LOAD DATA ----------
+async function loadData() {
+    const resp = await fetch(API + "/hostels/" + id);
+    if (!resp.ok) {
+        alert("Хостел не найден");
+        return;
+    }
+
+    const h = await resp.json();
+
+    document.getElementById("name").value = h.name ?? "";
+    document.getElementById("location").value = h.location ?? "";
+    document.getElementById("price_text").value = h.price_text ?? "";
+    document.getElementById("rating").value = h.rating ?? 1;
+    document.getElementById("description").value = h.description ?? "";
+    document.getElementById("preview").src = h.image_url ? API + h.image_url : "/static/noimg.png";
+}
+
+loadData();
+
+
+// ---------- SUBMIT FORM ----------
+document.getElementById("editForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const form = new FormData();
+    form.append("name", document.getElementById("name").value);
+    form.append("location", document.getElementById("location").value);
+    form.append("price_text", document.getElementById("price_text").value);
+    form.append("rating", document.getElementById("rating").value);
+    form.append("description", document.getElementById("description").value);
+
+    const file = document.getElementById("image").files[0];
+    if (file) form.append("image", file);
+
+    const resp = await fetch(API + "/hostels/" + id, {
+        method: "PUT",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        body: form
+    });
+
+    if (!resp.ok) {
+        alert("Ошибка сохранения");
+        return;
+    }
+
+    alert("Изменения сохранены!");
+    location.href = "my_hostels.html";
+};
+</script>
+
+</body>
+</html>

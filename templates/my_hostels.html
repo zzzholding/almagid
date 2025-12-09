@@ -1,265 +1,201 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Хостелы — АлмаГид</title>
-  <style>
-    :root {
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --muted: #6b7280;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    <meta charset="UTF-8">
+    <title>Мои хостелы — АлмаГид</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    body { margin:0; padding:24px; background:var(--bg); color:#111; }
-    .layout { max-width:1200px; margin:0 auto; }
+    <style>
+        :root {
+            --accent: #2563eb;
+            --danger: #e53935;
+            --bg: #f4f6fa;
+            --card: #ffffff;
+            --muted: #6b7280;
+            font-family: Inter, Arial, sans-serif;
+        }
 
-    .topbar {
-      display:flex; justify-content:space-between; align-items:center;
-      flex-wrap:wrap; gap:12px; margin-bottom:24px;
-    }
+        body {
+            background: var(--bg);
+            margin: 0;
+            padding: 24px;
+        }
 
-    .topbar-title h1 { margin:0; font-size:26px; font-weight:700; }
-    .topbar-title span { font-size:14px; color:var(--muted); }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
 
-    .btn-primary {
-      padding:9px 16px; border:none; border-radius:999px;
-      background:var(--accent); color:#fff; cursor:pointer;
-      text-decoration:none; font-size:14px;
-    }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: var(--accent);
+            cursor: pointer;
+        }
 
-    .btn-outline {
-      padding:8px 14px; border-radius:999px; border:1px solid #d1d5db;
-      background:#fff; color:#111; text-decoration:none; font-size:14px;
-    }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
 
-    .filters {
-      display:grid; grid-template-columns:2fr 1.3fr 1.2fr;
-      gap:12px; margin-bottom:18px;
-    }
+        .card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
 
-    .field, .select {
-      padding:8px 12px; border-radius:999px;
-      border:1px solid #d1d5db; background:#fff; font-size:14px;
-    }
+        .card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
 
-    .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-    .chip {
-      background:#e5e7eb; padding:4px 10px; border-radius:999px;
-      font-size:12px; color:var(--muted);
-      display:flex; gap:6px;
-    }
+        .title {
+            font-size: 18px;
+            margin: 10px 0 6px;
+            font-weight: 600;
+        }
 
-    .grid {
-      display:grid; gap:16px;
-      grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
-    }
+        .location {
+            font-size: 14px;
+            color: var(--muted);
+        }
 
-    .card {
-      background:var(--card); border-radius:16px;
-      box-shadow:0 4px 14px rgba(15,23,42,0.12);
-      display:flex; flex-direction:column; overflow:hidden;
-    }
+        .price {
+            margin-top: 8px;
+            font-size: 15px;
+            font-weight: 500;
+        }
 
-    .card-image { height:180px; background:#e5e7eb; position:relative; }
-    .card-image img { width:100%; height:100%; object-fit:cover; }
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .badge-rating {
-      position:absolute; bottom:10px; left:10px;
-      background:rgba(15,23,42,0.9); color:#fbbf24;
-      padding:4px 8px; border-radius:999px; font-size:12px;
-    }
+        .btn-edit {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-    .card-body {
-      padding:12px 14px; display:flex; flex-direction:column; gap:6px;
-    }
+        .btn-del {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-    .name { font-size:16px; font-weight:600; }
-
-    .location { font-size:13px; color:var(--muted); }
-    .price { font-size:14px; color:#16a34a; font-weight:500; }
-
-    .description {
-      font-size:14px; color:#374151;
-      max-height:3.6em; overflow:hidden;
-      display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;line-clamp: 3;
-    }
-
-    .card-footer {
-      margin-top:auto; padding-top:8px; border-top:1px solid #e5e7eb;
-      display:flex; justify-content:space-between; font-size:12px; color:var(--muted);
-    }
-
-    .link-more { color:var(--accent); font-size:13px; text-decoration:none; }
-  </style>
+        .empty {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 17px;
+            color: var(--muted);
+        }
+    </style>
 </head>
 
 <body>
-<div class="layout">
 
-  <div class="topbar">
-    <div class="topbar-title">
-      <h1>Хостелы</h1>
-      <span>Мои добавленные хостелы</span>
-    </div>
+<span class="back-btn" onclick="window.location.href='almagid.html'">← На главную</span>
 
-    <div class="topbar-actions">
-      <a href="gidadd.html" class="btn-primary">+ Добавить хостел</a>
-      <a href="almagid.html" class="btn-outline">На главную</a>
-    </div>
-  </div>
+<h1>Мои хостелы</h1>
 
-  <!-- Фильтры -->
-  <div class="filters">
-    <input id="searchInput" class="field" placeholder="Название хостела..." />
-    <select id="citySelect" class="select">
-      <option value="">Все города</option>
-    </select>
-    <select id="ratingSelect" class="select">
-      <option value="0">Любой рейтинг</option>
-      <option value="5">5★</option>
-      <option value="4">4★ и выше</option>
-      <option value="3">3★ и выше</option>
-    </select>
-  </div>
+<div id="list" class="grid"></div>
 
-  <!-- Активные фильтры -->
-  <div class="chips" id="chipsContainer"></div>
-
-  <!-- Карточки -->
-  <div id="grid" class="grid"></div>
-  <div id="empty" style="display:none; text-align:center; margin-top:20px; color:var(--muted);">
-    Пока нет хостелов. Добавьте первый.
-  </div>
-</div>
+<p id="empty" class="empty" style="display:none;">
+    У вас пока нет добавленных хостелов.
+</p>
 
 <script>
 const API = "http://127.0.0.1:8000";
 
-const grid = document.getElementById("grid");
-const empty = document.getElementById("empty");
-const chipsContainer = document.getElementById("chipsContainer");
+async function loadMyHostels() {
+    const token = localStorage.getItem("almagid_token");
 
-const searchInput = document.getElementById("searchInput");
-const citySelect = document.getElementById("citySelect");
-const ratingSelect = document.getElementById("ratingSelect");
+    if (!token) {
+        alert("Вы не авторизованы!");
+        location.href = "login.html";
+        return;
+    }
 
-let allHostels = [];
+    const resp = await fetch(API + "/hostels/my", {
+        headers: { "Authorization": "Bearer " + token }
+    });
 
-// ---------- фильтры ----------
-function renderChips() {
-  chipsContainer.innerHTML = "";
-  const chips = [];
+    if (!resp.ok) {
+        alert("Ошибка загрузки");
+        return;
+    }
 
-  if (searchInput.value.trim()) chips.push(["Поиск", searchInput.value]);
-  if (citySelect.value) chips.push(["Город", citySelect.value]);
-  if (+ratingSelect.value) chips.push(["Рейтинг", ratingSelect.value + "★+"]);
+    const hostels = await resp.json();
 
-  if (chips.length === 0) {
-    chipsContainer.innerHTML = `<div class="chip"><span>Фильтры</span> <span class="value">не применены</span></div>`;
-    return;
-  }
+    if (hostels.length === 0) {
+        document.getElementById("empty").style.display = "block";
+        return;
+    }
 
-  chips.forEach(([k, v]) => {
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.innerHTML = `<span>${k}:</span><span>${v}</span>`;
-    chipsContainer.appendChild(chip);
-  });
+    renderHostels(hostels);
 }
 
-function applyFilters() {
-  let filtered = [...allHostels];
+function renderHostels(items) {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-  const search = searchInput.value.toLowerCase();
-  if (search) filtered = filtered.filter(h => h.name.toLowerCase().includes(search));
+    for (const h of items) {
+        list.innerHTML += `
+            <div class="card">
+                <img src="${h.image_url ? API + h.image_url : '/static/noimg.png'}" alt="photo">
 
-  if (citySelect.value)
-    filtered = filtered.filter(h => h.location?.toLowerCase() === citySelect.value.toLowerCase());
+                <div class="title">${h.name}</div>
+                <div class="location">${h.location || ""}</div>
+                <div class="price">${h.price_text || ""}</div>
 
-  const minRating = +ratingSelect.value;
-  if (minRating > 0)
-    filtered = filtered.filter(h => (h.rating || 0) >= minRating);
-
-  renderChips();
-  renderHostels(filtered);
+                <div class="actions">
+                    <button class="btn-edit" onclick="editHostel(${h.id})">Редактировать</button>
+                    <button class="btn-del" onclick="deleteHostel(${h.id})">Удалить</button>
+                </div>
+            </div>
+        `;
+    }
 }
 
-function renderHostels(list) {
-  grid.innerHTML = "";
-  empty.style.display = list.length ? "none" : "block";
-
-  for (const h of list) {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    // image
-    const img = document.createElement("img");
-    img.src = h.image_url ? API + h.image_url : "";
-    img.alt = h.name;
-
-    const imgWrap = document.createElement("div");
-    imgWrap.className = "card-image";
-    imgWrap.appendChild(img);
-
-    const badge = document.createElement("div");
-    badge.className = "badge-rating";
-    badge.textContent = `★ ${h.rating}`;
-    imgWrap.appendChild(badge);
-
-    card.appendChild(imgWrap);
-
-    // body
-    const body = document.createElement("div");
-    body.className = "card-body";
-
-    body.innerHTML = `
-      <div class="name">${h.name}</div>
-      <div class="location">${h.location || "Город не указан"}</div>
-      ${h.price_text ? `<div class="price">${h.price_text}</div>` : ""}
-      <div class="description">${h.description || ""}</div>
-    `;
-
-    const footer = document.createElement("div");
-    footer.className = "card-footer";
-    footer.innerHTML = `
-      <span>ID #${h.id}</span>
-      <a href="hostel_detail.html?id=${h.id}" class="link-more">Подробнее</a>
-    `;
-
-    body.appendChild(footer);
-    card.appendChild(body);
-
-    grid.appendChild(card);
-  }
+function editHostel(id) {
+    window.location.href = "hostel_edit.html?id=" + id;
 }
 
-function fillCityFilter() {
-  const cities = [...new Set(allHostels.map(h => h.location).filter(Boolean))];
-  citySelect.innerHTML = `<option value="">Все города</option>`;
-  cities.sort().forEach(city => {
-    citySelect.innerHTML += `<option value="${city}">${city}</option>`;
-  });
+async function deleteHostel(id) {
+    if (!confirm("Удалить хостел?")) return;
+
+    const token = localStorage.getItem("almagid_token");
+
+    const resp = await fetch(API + "/hostels/" + id, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+    });
+
+    if (!resp.ok) {
+        alert("Ошибка удаления");
+        return;
+    }
+
+    alert("Удалено");
+    loadMyHostels();
 }
 
-async function loadHostels() {
-  const resp = await fetch(API + "/hostels");
-  const data = await resp.json();
-
-  allHostels = data;
-  fillCityFilter();
-  renderChips();
-  renderHostels(allHostels);
-}
-
-searchInput.addEventListener("input", applyFilters);
-citySelect.addEventListener("change", applyFilters);
-ratingSelect.addEventListener("change", applyFilters);
-
-loadHostels();
+loadMyHostels();
 </script>
 
 </body>
