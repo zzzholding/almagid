@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль — АлмаГид</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent: #2563eb;
+            --bg: #f4f6fa;
+            --card: #ffffff;
+            --muted: #6b7280;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background: var(--bg);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-box {
+            max-width: 550px;
+            background: var(--card);
+            margin: auto;
+            padding: 22px;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+        .avatar-wrapper {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+        }
+
+        .change-avatar {
+            margin-top: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .block {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 4px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-size: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #10b981;
+        }
+
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Мой профиль</h1>
+
+<div class="profile-box">
+
+    <!-- АВАТАР -->
+    <div class="avatar-wrapper">
+        <img id="avatar" class="avatar" src="/static/noavatar.png">
+        <div class="change-avatar" onclick="avatarInput.click()">Изменить фото</div>
+        <input type="file" id="avatarInput" style="display:none">
+    </div>
+
+    <!-- ОСНОВНЫЕ ДАННЫЕ -->
+    <div class="block">
+        <h3>Личные данные</h3>
+
+        <label>Имя</label>
+        <input type="text" id="full_name">
+
+        <label>Email</label>
+        <input type="email" id="email">
+
+        <label>Телефон</label>
+        <input type="text" id="phone">
+
+        <button class="btn" onclick="saveProfile()">Изменить данные</button>
+    </div>
+
+    <!-- СМЕНА ПАРОЛЯ -->
+    <div class="block">
+        <h3>Смена пароля</h3>
+
+        <label>Старый пароль</label>
+        <input type="password" id="old_pass">
+
+        <label>Новый пароль</label>
+        <input type="password" id="new_pass">
+
+        <label>Повторите новый пароль</label>
+        <input type="password" id="new_pass2">
+
+        <button class="btn btn-secondary" onclick="changePassword()">Изменить пароль</button>
+    </div>
+
+    <a class="link" style="color:red; margin-top:14px;" onclick="logout()">Выйти из аккаунта</a>
+
+    <a href="almagid.html" class="link">← На главную</a>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+const token = localStorage.getItem("almagid_token");
+
+if (!token) {
+    alert("Не авторизован");
+    location.href = "login.html";
+}
+
+async function loadProfile() {
+    const resp = await fetch(API + "/me", {
+        headers: { "Authorization": "Bearer " + token }
+    });
+
+    if (!resp.ok) {
+        alert("Ошибка загрузки профиля");
+        return;
+    }
+
+    const u = await resp.json();
+
+    document.getElementById("full_name").value = u.full_name || "";
+    document.getElementById("email").value = u.email || "";
+    document.getElementById("phone").value = u.phone || "";
+    document.getElementById("avatar").src = u.avatar_url || "/static/noimg.png";
+}
+
+loadProfile();
+
+/* АВАТАР */
+document.getElementById("avatarInput").onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append("avatar", file);
+
+    const resp = await fetch(API + "/me/avatar", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token },
+        body: fd
+    });
+
+    if (resp.ok) {
+        alert("Аватар обновлён!");
+        loadProfile();
+    }
+};
+
+/* СОХРАНЕНИЕ ДАННЫХ */
+async function saveProfile() {
+    const fd = new FormData();
+    fd.append("full_name", full_name.value);
+    fd.append("email", email.value);
+    fd.append("phone", phone.value);
+
+    const resp = await fetch(API + "/me", {
+        method: "PUT",
+        headers: { "Authorization": "Bearer " + token },
+        body: fd
+    });
+
+    if (resp.ok) {
+        alert("Данные обновлены!");
+    } else {
+        alert("Ошибка");
+    }
+}
+
+/* СМЕНА ПАРОЛЯ */
+async function changePassword() {
+    const old_p = old_pass.value;
+    const new_p = new_pass.value;
+    const rep = new_pass2.value;
+
+    if (new_p !== rep) {
+        alert("Новые пароли не совпадают!");
+        return;
+    }
+
+    const resp = await fetch(API + "/auth/change_password", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            old_password: old_p,
+            new_password: new_p
+        })
+    });
+
+    if (resp.ok) {
+        alert("Пароль изменён!");
+        old_pass.value = "";
+        new_pass.value = "";
+        new_pass2.value = "";
+    } else {
+        alert("Ошибка смены пароля");
+    }
+}
+
+/* ВЫХОД */
+function logout() {
+    localStorage.removeItem("almagid_token");
+    location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

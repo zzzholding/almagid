@@ -10,6 +10,11 @@ from app.author import router as auth_router
 from app.gidadd import router as places_router
 from app.hostels import router as hostels_router
 
+from app.profile import router as profile_router
+from app.change_password import router as change_password_router
+
+
+
 app = FastAPI(title="Almagid API")
 
 app.add_middleware(
@@ -28,6 +33,11 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
 app.include_router(places_router)
 app.include_router(hostels_router)
+
+app.include_router(profile_router)
+app.include_router(change_password_router)
+
+
 
 #docker exec -it alma_redis redis-cli
 #docker compose down

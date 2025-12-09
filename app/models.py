@@ -10,8 +10,18 @@ class User(Base):
     full_name = Column(String(255), nullable=False)
     phone = Column(String(32), nullable=False, unique=True)
     email = Column(String(255), nullable=False, unique=True)
+    avatar_url = Column(String, nullable=True)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # 🔥 чтобы фронт мог читать user.name
+    @property
+    def name(self):
+        return self.full_name
+
+    @name.setter
+    def name(self, value):
+        self.full_name = value
 
 
 class Place(Base):
