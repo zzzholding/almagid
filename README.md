@@ -1,282 +1,252 @@
-README.md – AlmaGid Backend
-Жобаның сипаттамасы
-AlmaGid — туристік орындар мен хостелдерді басқаруға арналған веб-қызмет.
-Жүйеде пайдаланушылар тіркеліп, авторизациядан өтеді, өзінің профилін басқара алады, хостелдер мен орындарды қосады, өңдейді және өшіреді.
-Бэкенд FastAPI, мәліметтер базасы PostgreSQL, контейнеризация Docker арқылы жасалған.
- 
-Мүмкіндіктер (Features)
-Пайдаланушы
-• Тіркелу
-• 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-Логин (JWT токен)
-• 
-• Профиль көру
-• 
-•  
-•  
-•  
-•  
-•  
-•  
-•  
-•  
-• Профиль өзгерту
-• 
-• Аватар жүктеу
-• 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-Пароль өзгерту
-• 
-Контент
-• Хостелдер CRUD
-• 
-• Туристік орындар (Places) CRUD
-• 
-• Суреттерді серверге жүктеу
-• 
-• 
-• Тек иесі ғана өңдей/өшіреді
-• 
-• 
-• 
- 
-Технологиялар
-• Python 3.11
-• FastAPI
-• PostgreSQL
-• SQLAlchemy
-• Docker / Docker Compose
-• JWT авторизация
-• Passlib (пароль хештеу)
- 
- 
- 
-Папка құрылымы
- 
-app/
-│── author.py
-│── change_password.py
-│── db.py
-│── hostels.py
-│── gidadd.py
-│── profile.py
-│── models.py
-│── schemas_user.py
-│── main.py
-static/
-│── uploads/
-│── avatars/
-templates/
-│── profile.html
-│── hostels.html итд
-docker-compose.yml
-Dockerfile
-requirements.txt
-README.md
- 
-Іске қосу нұсқаулығы
-1. Репозиторийді жүктеу
-git clone <repo_url>
-cd project
-2. Орнату (Docker)
+README.md (АлмаГид API)
+
+AlmaGid API — Backend сервис (FastAPI + PostgreSQL + Docker)
+
+Бұл проект — тур-агенттіктер мен хостелдерді басқаруға арналған серверлік платформа.
+Пайдаланушылар тіркеліп, авторизациядан өтеді, өз профилін басқара алады, хостелдер мен агенттіктер қосады, өңдейді және жояды.
+
+Қолданылған технологиялар
+	•	FastAPI — негізгі backend фреймворк
+	•	PostgreSQL — мәліметтер базасы
+	•	SQLAlchemy — ORM
+	•	Docker + docker-compose — толық контейнерлеу
+	•	JWT (JOSE) — авторизация
+	•	Passlib — пароль хэштеу
+	•	Static file storage — суреттерді жүктеу
+	•	Redis (опционалды) — кэш
+
+⸻
+
+1. Жобаны іске қосу
+
+Қажет:
+	•	Docker
+	•	Docker Compose
+
+Іске қосу командасы
+
 docker compose up --build
-Қызмет іске қосылады:
-→ http://localhost:8000
-Swagger UI:
-→ http://localhost:8000/docs
- 
-Environment айнымалылары
-docker-compose.yml ішінде:
-POSTGRES_DB= my_db
-POSTGRES_USER= my_user
-POSTGRES_PASSWORD=root
+
+Сервер сілтемелері:
+
+Қызмет	URL
+API	http://localhost:8000
+Swagger UI	http://localhost:8000/docs
+Static files	http://localhost:8000/static
+Uploads (картинки)	/static/uploads/…
+Avatars	/static/avatars/…
+
+
+⸻
+
+2. ENV конфигурациясы
+
+docker-compose.yml ішінде автоматты түрде орнатылған.
+
+Егер .env қолдансаңыз:
+
+DATABASE_URL=postgresql://postgres:postgres@db:5432/almagid
 JWT_SECRET=change_me_secret_key
- 
- 
- 
- 
- 
-API (Негізгі endpoint-тар)
-Аутентификация
-Method
-Endpoint
-Description
-POST
-/auth/register
-Тіркелу
-POST
-/auth/login
-Логин (JWT токен)
-Профиль
-Method
-Endpoint
-Description
-GET
-/me
-Профиль ақпаратын алу
-PUT
-/me
-Өңдеу
-POST
-/me/avatar
-Аватар жүктеу
-POST
-/auth/change_password
-Пароль өзгерту
-Hostels
-Method
-Endpoint
-GET
-/hostels
-GET
-/hostels/my
-POST
-/hostels
-PUT
-/hostels/{id}
-DELETE
-/hostels/{id}
-Places
-Method
-Endpoint
-GET
-/places
-POST
-/places
-PUT
-/places/{id}
-DELETE
-/places/{id}
- 
-Тесттер (curl мысалдары)
+
+
+⸻
+
+3. МБ миграция және құрылымы
+
+Кестелер
+	•	users
+	•	places
+	•	hostels
+
+Негізгі байланыстар
+
+User (1) — (N) Place  
+User (1) — (N) Hostel
+
+
+⸻
+
+4. API құжаттамасы
+
+Swagger:
+➡ http://localhost:8000/docs
+
+Авторизация
+
+POST /auth/register
+
+{
+  "full_name": "Test User",
+  "phone": "87001112233",
+  "email": "test@mail.com",
+  "password": "1234"
+}
+
+POST /auth/login
+
+{
+  "email": "test@mail.com",
+  "password": "1234"
+}
+
+Жауабы:
+
+{"access_token": "<jwt>"}
+
+
+⸻
+
+5. Пайдаланушы профилі
+
+GET /me
+
+JWT арқылы ағымдағы пайдаланушыны қайтарады.
+
+PUT /me
+
+Form-data:
+
+full_name
+email
+phone
+
+POST /me/avatar
+
+Файл жүктеу:
+
+avatar: <image>
+
+Жүктелген сурет сақталады:
+
+/static/avatars/<id_timestamp>.jpg
+
+
+⸻
+
+6. Тур-агенттіктер API (places)
+
+GET /places
+
+Барлық агенттіктер тізімі
+
+GET /places/my
+
+Тек ағымдағы пайдаланушының агенттіктері
+
+POST /places
+
+Form-data:
+
+name
+location
+price_text
+rating
+description
+image (optional)
+
+PUT /places/{id}
+
+DELETE /places/{id}
+
+⸻
+
+7. Хостелдер API (hostels)
+
+GET /hostels
+
+GET /hostels/my
+
+POST /hostels
+
+PUT /hostels/{id}
+
+DELETE /hostels/{id}
+
+Толық функционал places сияқты.
+
+⸻
+
+8. Docker құрылымы
+
+docker-compose.yml
+
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: alma_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./static:/app/static
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: alma_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: almagid
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
+Dockerfile
+
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+⸻
+
+9. Тесттер (мысал)
+
 1) Тіркелу
+
 curl -X POST http://localhost:8000/auth/register \
 -H "Content-Type: application/json" \
--d '{"full_name":"Test","email":"test@mail.com","phone":"123","password":"1234"}'
-2) Логин
-curl -X POST http://localhost:8000/auth/login \
--H "Content-Type: application/json" \
--d '{"email":"test@mail.com","password":"1234"}'
-3) Профильді алу
-curl -H "Authorization: Bearer <token>" http://localhost:8000/me
- 
- 
- 
-4) Аватар жүктеу
-curl -X POST -F "avatar=@photo.png" \
--H "Authorization: Bearer <token>" \
+-d '{"full_name":"Aaa", "phone":"111", "email":"t@t.com", "password":"1234"}'
+
+2) Аватар жүктеу
+
+curl -X POST -H "Authorization: Bearer <token>" \
+-F "avatar=@me.png" \
 http://localhost:8000/me/avatar
-5) Хостел қосу
-curl -X POST http://localhost:8000/hostels \
--H "Authorization: Bearer <token>" \
--F "name=Test Hostel" \
--F "location=Almaty" \
--F "price_text=5000" \
--F "rating=5" \
--F "description=Nice place" \
--F "image=@img.png"
- 
-Мәліметтер базасы (ER Diagram)
-• User (1) → (N) Hostels
-• User (1) → (N) Places
-Table
-Description
-users
-Пайдаланушылар
-hostels
-Хостелдер
-places
-Туристік орындар
- 
- 
- 
-
- 
-•  Әр user — контент жасаушы.
-•  User көптеген Place сала алады.
-•  User көптеген Hostel сала алады.
-•  Егер user өшірілсе → оның барлық hostels және places бірге өшеді (CASCADE).
- 
- 
- 
-Mock және Test деректер
-– Жобаға кіретін бастапқы деректерді seed.sql арқылы енгізуге болады
-– Mock сервистер қажет емес (жоба жеке автономды)
- 
- 
 
 
- 
- 
- 
- 
- 
-Лог жүргізу
-FastAPI автоматты лог жүргізеді
-Docker контейнер журналдары:
-docker logs alma_api
-docker logs alma_db
-alma_db     | 2025-12-10 22:00:32.717 UTC [1] LOG:  starting PostgreSQL 15.15 (Debian 15.15-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
-alma_db     | 2025-12-10 22:00:32.719 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
-alma_db     | 2025-12-10 22:00:32.719 UTC [1] LOG:  listening on IPv6 address "::", port 5432                                                                                  
-alma_db     | 2025-12-10 22:00:32.728 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
-alma_db     | 2025-12-10 22:00:32.743 UTC [29] LOG:  database system was shut down at 2025-12-10 22:00:09 UTC                                                                  
-alma_db     | 2025-12-10 22:00:32.760 UTC [1] LOG:  database system is ready to accept connections                                                                            
-Gracefully Stopping... press Ctrl+C again to force
-(86f38014926e7d55efa1646b0679923fc23daf9544713969d201a93400b9377c): Bind for 0.0.0.0:8000 failed: port is already allocated
-(.venv) PS C:\Users\дон\Desktop\Almagid>
- 
-Талаптарға сәйкестік
-Талап
-Статус
-Backend толық
-✔
-Авторизация
-✔
-Профиль
-✔
-Hostels CRUD
-✔
-Places CRUD
-✔
-Docker
-redis
-✔
-DB
-✔
-README
-✔
-Swagger
-✔
-Тесттер
-✔
- 
-Қорытынды
-Жоба толығымен функционалдық және архитектуралық талаптарға сәйкес келеді, контейнерлерде жұмыс істейді, Postgres-ке жалғанады, барлық API жұмыс істейді, Swagger құжаттамасы бар.
+⸻
+
+10. Талаптар сәйкестігі
+
+Талап	Статус
+Backend бар	✔
+ДБ PostgreSQL	✔
+Миграция/Модельдер	✔
+Docker контейнерлеу	✔
+CRUD толық	✔
+Авторизация	✔
+Сурет жүктеу	✔
+Тесттер	✔
+README	✔
+
+
+⸻
+
+11. Қорытынды
+
+Жоба толықтай бірінші бөлімнің талаптарына сәйкес жүзеге асырылды.
+FastAPI + PostgreSQL + Docker негізіндегі толық жұмыс істейтін backend дайын.
